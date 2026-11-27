@@ -7,7 +7,7 @@ from agora.manifest import load
 from agora.simulate import gossip
 from agora.society import Society
 from agora.taskset import AgoraTaskset, manifest_docs
-from agora.tensor import KINDS, board_map, tensor_root
+from agora.tensor import KINDS, MAX_BYTES, board_map, tensor_root
 
 NAMES = {1: "ada", 2: "bo", 3: "cy"}
 
@@ -155,3 +155,10 @@ def test_board_tensor_map():
     assert board_map(replay([m.to_json() for m in hub.log], NAMES)) == blob
     hub.submit(Message.make("link_remove", 3, 14, kind="follow", target=1))
     assert tensor_root(hub) != "b3adaa37adbd4be54562ba19438fc7d29af932b5a2fb479e21003c760ca1ff0e"
+
+
+def test_board_over_the_map_limit_is_refused():
+    n = 7400
+    assert 4 * len(KINDS) * n * n > MAX_BYTES
+    with pytest.raises(ValueError, match="too_large"):
+        tensor_root(Hub({fid: f"u{fid}" for fid in range(1, n + 1)}))
