@@ -1,3 +1,5 @@
+import struct
+
 import pytest
 
 from agora.hub import Hub, Limits, Message, Rejected, replay
@@ -5,6 +7,7 @@ from agora.manifest import load
 from agora.simulate import gossip
 from agora.society import Society
 from agora.taskset import AgoraTaskset, manifest_docs
+from agora.tensor import KINDS, MAX_BYTES, board_map, tensor_root
 
 NAMES = {1: "ada", 2: "bo", 3: "cy"}
 
@@ -120,3 +123,42 @@ def test_dotted_names_are_refused():
             d["metadata"]["name"] = "crit.ic"
     with pytest.raises(ValueError, match="must match"):
         load(docs)
+
+
+def test_board_tensor_map():
+    hub = Hub(NAMES)
+    for t, fid in enumerate(NAMES, 1):
+        hub.submit(Message.make("channel_join", fid, t, name="general"))
+    root = Message.make("cast_add", 1, 10, text="hello @bo", channel="general", mentions=[2])
+    hub.submit(root)
+    hub.submit(Message.make("cast_add", 2, 11, text="hi", parent=root.hash, mentions=[]))
+    hub.submit(Message.make("link_add", 3, 12, kind="follow", target=1))
+    hub.submit(Message.make("reaction_add", 3, 13, kind="like", target=root.hash))
+    blob = board_map(hub)
+    # bytes web ref/tensor.py unpack reads and pack rewrites identically
+    assert (len(blob), tensor_root(hub)) == (
+        329,
+        "b3adaa37adbd4be54562ba19438fc7d29af932b5a2fb479e21003c760ca1ff0e",
+    )
+    assert blob[:13] == b"tmap1\x05board\x05\x00"
+    adjacency = struct.unpack("<45I", blob[37 : 37 + 180])
+    cell = {
+        (k, i, j): adjacency[(k * 3 + i) * 3 + j]
+        for k in range(5)
+        for i in range(3)
+        for j in range(3)
+    }
+    on = {(KINDS[k], i + 1, j + 1) for (k, i, j), v in cell.items() if v}
+    assert on == {(e.kind, e.src, e.dst) for e in hub.edges()}
+    assert b"hello" not in blob
+    assert replay([m.to_json() for m in hub.log], NAMES).root == hub.root
+    assert board_map(replay([m.to_json() for m in hub.log], NAMES)) == blob
+    hub.submit(Message.make("link_remove", 3, 14, kind="follow", target=1))
+    assert tensor_root(hub) != "b3adaa37adbd4be54562ba19438fc7d29af932b5a2fb479e21003c760ca1ff0e"
+
+
+def test_board_over_the_map_limit_is_refused():
+    n = 7400
+    assert 4 * len(KINDS) * n * n > MAX_BYTES
+    with pytest.raises(ValueError, match="too_large"):
+        tensor_root(Hub({fid: f"u{fid}" for fid in range(1, n + 1)}))
