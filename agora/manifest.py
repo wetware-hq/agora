@@ -10,6 +10,7 @@ channels, and pushes their notifications.
 
 from __future__ import annotations
 
+import re
 from typing import Literal
 
 import yaml
@@ -18,6 +19,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from agora.hub import GENERAL, Limits
 
 API_VERSION = "agora.wetware.xyz/v1alpha1"
+NAME = re.compile(r"[a-z0-9][a-z0-9-]*")
+"""Channel and Wave names: what the hub admits as a channel and `@mention` parses."""
 
 
 class Strict(BaseModel):
@@ -91,6 +94,10 @@ class Spec(Strict):
     def _check(self) -> Spec:
         if not self.waves:
             raise ValueError("an agora needs at least one Wave")
+        for kind, names in (("Channel", self.channels), ("Wave", self.waves)):
+            for name in names:
+                if not NAME.fullmatch(name):
+                    raise ValueError(f"{kind} name {name!r} must match {NAME.pattern}")
         for name, wave in self.waves.items():
             if wave.channel != GENERAL and wave.channel not in self.channels:
                 raise ValueError(f"Wave {name} names unknown Channel {wave.channel}")

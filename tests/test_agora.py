@@ -111,3 +111,12 @@ def test_recast_reaches_followers():
     hub.submit(Message.make("link_add", 3, 6, kind="follow", target=2))
     hub.submit(Message.make("reaction_add", 2, 7, kind="recast", target=cast.hash))
     assert [(n.reason, n.cast.hash) for n in hub.inbox(3, 6)] == [("recast", cast.hash)]
+
+
+def test_dotted_names_are_refused():
+    docs = manifest_docs("agora")
+    for d in docs:
+        if d["kind"] == "Wave" and d["metadata"]["name"] == "critic":
+            d["metadata"]["name"] = "crit.ic"
+    with pytest.raises(ValueError, match="must match"):
+        load(docs)
