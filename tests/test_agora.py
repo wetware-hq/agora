@@ -99,3 +99,15 @@ def test_shards_only_go_to_citizens_who_start():
     society = Society(load(docs), 0)
     starts = {a.fid: a.start for a in society.agents}
     assert all(starts[fid] < society.spec.agora.rounds for fid in society.shard)
+
+
+def test_recast_reaches_followers():
+    hub = Hub(NAMES)
+    for t, fid in enumerate(NAMES, 1):
+        hub.submit(Message.make("channel_join", fid, t, name="general"))
+    hub.submit(Message.make("channel_add", 1, 4, name="lane", purpose=""))
+    cast = Message.make("cast_add", 1, 5, text="news", channel="lane", mentions=[])
+    hub.submit(cast)
+    hub.submit(Message.make("link_add", 3, 6, kind="follow", target=2))
+    hub.submit(Message.make("reaction_add", 2, 7, kind="recast", target=cast.hash))
+    assert [(n.reason, n.cast.hash) for n in hub.inbox(3, 6)] == [("recast", cast.hash)]

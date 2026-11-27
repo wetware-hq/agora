@@ -293,9 +293,9 @@ class Hub:
     def inbox(self, fid: int, since: int, until: int | None = None) -> list[Notice]:
         """What the controller pushes to `fid` for casts with since <= timestamp < until:
         mentions first, then replies in threads it wrote in, then new topics in its
-        channels, then casts by those it follows; newest first within a reason,
-        capped at `limits.inbox`."""
-        rank = {"mention": 0, "reply": 1, "topic": 2, "follow": 3}
+        channels, then casts by those it follows, then casts they recast in the window;
+        newest first within a reason, capped at `limits.inbox`."""
+        rank = {"mention": 0, "reply": 1, "topic": 2, "follow": 3, "recast": 4}
         follows = self.following(fid)
         picked: dict[str, Notice] = {}
         for cast in self.casts.values():
@@ -314,6 +314,14 @@ class Hub:
                 reasons.append("follow")
             if reasons:
                 picked[cast.hash] = Notice(min(reasons, key=rank.get), cast)
+        for m in self.live(self.reactions):
+            cast = self.casts.get(m.data["target"])
+            if m.data["kind"] != "recast" or m.fid not in follows or cast is None:
+                continue
+            if cast.fid == fid or cast.hash in picked or m.timestamp < since:
+                continue
+            if until is None or m.timestamp < until:
+                picked[cast.hash] = Notice("recast", cast)
         notices = sorted(
             picked.values(),
             key=lambda n: (rank[n.reason], -n.cast.timestamp, n.cast.hash),
