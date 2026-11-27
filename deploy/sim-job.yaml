@@ -10,7 +10,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: sim
-          image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+          image: ghcr.io/astral-sh/uv:python3.12-bookworm
           command: ["sh", "-c"]
           args:
             - uvx --from git+https://github.com/wetware-hq/agora agora-sim --manifest polis
