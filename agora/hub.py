@@ -116,6 +116,8 @@ class Edge:
 class Notice:
     reason: str
     cast: Cast
+    at: int
+    """When the event behind the notice happened: the cast, or its recast."""
 
 
 class Hub:
@@ -313,7 +315,7 @@ class Hub:
             if cast.fid in follows:
                 reasons.append("follow")
             if reasons:
-                picked[cast.hash] = Notice(min(reasons, key=rank.get), cast)
+                picked[cast.hash] = Notice(min(reasons, key=rank.get), cast, cast.timestamp)
         for m in self.live(self.reactions):
             cast = self.casts.get(m.data["target"])
             if m.data["kind"] != "recast" or m.fid not in follows or cast is None:
@@ -321,10 +323,10 @@ class Hub:
             if cast.fid == fid or cast.hash in picked or m.timestamp < since:
                 continue
             if until is None or m.timestamp < until:
-                picked[cast.hash] = Notice("recast", cast)
+                picked[cast.hash] = Notice("recast", cast, m.timestamp)
         notices = sorted(
             picked.values(),
-            key=lambda n: (rank[n.reason], -n.cast.timestamp, n.cast.hash),
+            key=lambda n: (rank[n.reason], -n.at, n.cast.hash),
         )
         return notices[: self.limits.inbox]
 
