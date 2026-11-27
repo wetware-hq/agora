@@ -1,0 +1,54 @@
+# The default agora: 8 citizens in two lanes, rolled out in two batches per wave.
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Agora
+metadata:
+  name: agora
+spec:
+  goal: Assemble the secret key from its scattered shards, so that every citizen can answer it, as early as possible.
+  rounds: 6
+  shards: 4
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Quota
+metadata:
+  name: board
+spec:
+  maxCastBytes: 1200
+  maxMentions: 10
+  maxChannels: 40
+  maxActionsPerTurn: 8
+  inbox: 20
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: conjecture
+spec:
+  purpose: the positive lane, says what the key could be
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: refute
+spec:
+  purpose: the negative lane, checks claimed shards against their holders
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: conjecturer
+spec:
+  replicas: 4
+  channel: conjecture
+  role: conjecturer
+  rollout: {maxSurge: 2, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: critic
+spec:
+  replicas: 4
+  channel: refute
+  role: critic
+  rollout: {maxSurge: 2, interval: 1}

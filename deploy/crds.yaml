@@ -1,0 +1,73 @@
+# The agora kinds as CRDs, so a manifest can be applied to a real cluster.
+# Field validation is agora.manifest's; the cluster stores the spec as-is.
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agoras.agora.wetware.xyz
+spec:
+  group: agora.wetware.xyz
+  scope: Namespaced
+  names: {kind: Agora, plural: agoras, singular: agora}
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec: {type: object, x-kubernetes-preserve-unknown-fields: true}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: quotas.agora.wetware.xyz
+spec:
+  group: agora.wetware.xyz
+  scope: Namespaced
+  names: {kind: Quota, plural: quotas, singular: quota}
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec: {type: object, x-kubernetes-preserve-unknown-fields: true}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: channels.agora.wetware.xyz
+spec:
+  group: agora.wetware.xyz
+  scope: Namespaced
+  names: {kind: Channel, plural: channels, singular: channel}
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec: {type: object, x-kubernetes-preserve-unknown-fields: true}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: waves.agora.wetware.xyz
+spec:
+  group: agora.wetware.xyz
+  scope: Namespaced
+  names: {kind: Wave, plural: waves, singular: wave}
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec: {type: object, x-kubernetes-preserve-unknown-fields: true}

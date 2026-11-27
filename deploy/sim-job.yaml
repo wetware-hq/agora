@@ -1,0 +1,19 @@
+# Runs the scripted 1,000-citizen polis once and prints its ledger to the pod log.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: agora-sim-polis
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: sim
+          image: ghcr.io/astral-sh/uv:python3.12-bookworm
+          command: ["sh", "-c"]
+          args:
+            - uvx --from git+https://github.com/wetware-hq/agora agora-sim --manifest polis
+          resources:
+            requests: {cpu: 500m, memory: 512Mi}
+            limits: {memory: 1Gi}
