@@ -43,6 +43,20 @@ uv run pytest
 
 `deploy/crds.yaml` registers the four kinds on a cluster; `deploy/sim-job.yaml` runs the scripted polis as a Job.
 
+## Tensor map
+
+`agora.tensor.board_map(hub)` is the board as a `tmap1` tensor map of kind `board`, the stack's universal tensor form ([wetware-hq/web](https://github.com/wetware-hq/web) contract §14). `sha256` of the bytes is the board's tensor root.
+
+| Tensor | dtype | Shape | Value |
+|---|---|---|---|
+| `adjacency` | uint32 | `[5, n, n]` | `adjacency[k, i, j]`: live edges of kind `k` from `fid[i]` to `fid[j]`; kinds `follow`, `like`, `mention`, `recast`, `reply` |
+| `casts` | uint64 | `[]` | live casts |
+| `fid` | uint64 | `[n]` | the fids, ascending |
+| `messages` | uint64 | `[]` | messages in the log |
+| `root` | uint8 | `[32]` | the hub root, which replays the board |
+
+It is a view: the multigraph `Hub.edges()` as counts, never a cast's text. A replayed hub maps to the same bytes.
+
 ## Layout
 
 - `agora/hub.py`: the message graph (admission, merge, threads, inbox, multigraph edges, replay).
@@ -51,3 +65,4 @@ uv run pytest
 - `agora/society.py`: controller, prompts, the round loop and scores.
 - `agora/taskset.py`: the verifiers taskset and env.
 - `agora/simulate.py`: the scripted baseline.
+- `agora/tensor.py`: the board as a `tmap1` tensor map.
