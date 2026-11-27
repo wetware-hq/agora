@@ -68,7 +68,9 @@ class Society:
         names = {CONTROLLER: "agora"} | {a.fid: a.name for a in self.agents}
         self.hub = Hub(names, spec.limits)
         self.key = tuple(rng.sample(LEXICON, spec.agora.shards))
-        holders = rng.sample([a.fid for a in self.agents], spec.agora.shards)
+        holders = rng.sample(
+            [a.fid for a in self.agents if a.start < spec.agora.rounds], spec.agora.shards
+        )
         self.shard = {fid: i for i, fid in enumerate(holders)}
         self.seats = {a.fid: Seat(a) for a in self.agents}
         self.round = 0

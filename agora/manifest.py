@@ -96,8 +96,8 @@ class Spec(Strict):
                 raise ValueError(f"Wave {name} names unknown Channel {wave.channel}")
         if len(self.channels) + 1 > self.quota.max_channels:
             raise ValueError("Channels exceed the Quota's maxChannels")
-        if sum(w.replicas for w in self.waves.values()) < self.agora.shards:
-            raise ValueError("fewer agents than shards")
+        if sum(a.start < self.agora.rounds for a in self.agents()) < self.agora.shards:
+            raise ValueError("fewer agents start before the last round than there are shards")
         return self
 
     @property

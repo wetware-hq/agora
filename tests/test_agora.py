@@ -89,3 +89,13 @@ def test_taskset_loads():
     )
     if tasks is not None:
         assert len(tasks) == 3
+
+
+def test_shards_only_go_to_citizens_who_start():
+    docs = manifest_docs("agora")
+    for d in docs:
+        if d["kind"] == "Wave" and d["metadata"]["name"] == "critic":
+            d["spec"]["startRound"] = 99
+    society = Society(load(docs), 0)
+    starts = {a.fid: a.start for a in society.agents}
+    assert all(starts[fid] < society.spec.agora.rounds for fid in society.shard)
