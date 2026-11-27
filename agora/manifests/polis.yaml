@@ -1,0 +1,190 @@
+# A society-scale agora: 1,000 citizens in 10 lanes, grown in staggered waves.
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Agora
+metadata:
+  name: polis
+spec:
+  goal: Assemble the secret key from its scattered shards, so that every citizen can answer it, as early as possible.
+  rounds: 12
+  shards: 8
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Quota
+metadata:
+  name: board
+spec:
+  maxCastBytes: 1200
+  maxMentions: 10
+  maxChannels: 40
+  maxActionsPerTurn: 8
+  inbox: 20
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: understanding
+spec:
+  purpose: lane 1 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: understanding
+spec:
+  replicas: 100
+  channel: understanding
+  startRound: 0
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: answers
+spec:
+  purpose: lane 2 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: answers
+spec:
+  replicas: 100
+  channel: answers
+  startRound: 0
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: conversation
+spec:
+  purpose: lane 3 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: conversation
+spec:
+  replicas: 100
+  channel: conversation
+  startRound: 0
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: routing
+spec:
+  purpose: lane 4 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: routing
+spec:
+  replicas: 100
+  channel: routing
+  startRound: 0
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: memory
+spec:
+  purpose: lane 5 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: memory
+spec:
+  replicas: 100
+  channel: memory
+  startRound: 1
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: knowledge
+spec:
+  purpose: lane 6 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: knowledge
+spec:
+  replicas: 100
+  channel: knowledge
+  startRound: 1
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: style
+spec:
+  purpose: lane 7 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: style
+spec:
+  replicas: 100
+  channel: style
+  startRound: 1
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: deck
+spec:
+  purpose: lane 8 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: deck
+spec:
+  replicas: 100
+  channel: deck
+  startRound: 1
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: review
+spec:
+  purpose: lane 9 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: review
+spec:
+  replicas: 100
+  channel: review
+  startRound: 2
+  rollout: {maxSurge: 25, interval: 1}
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Channel
+metadata:
+  name: tooling
+spec:
+  purpose: lane 10 of 10
+---
+apiVersion: agora.wetware.xyz/v1alpha1
+kind: Wave
+metadata:
+  name: tooling
+spec:
+  replicas: 100
+  channel: tooling
+  startRound: 2
+  rollout: {maxSurge: 25, interval: 1}
